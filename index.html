@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>森林小徑 — 21:9 橫軸關卡</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    *::selection {
+      background: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0f;
+      font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    #game-shell {
+      position: relative;
+      width: min(100vw, calc(100vh * 21 / 9));
+      height: min(100vh, calc(100vw * 9 / 21));
+      aspect-ratio: 21 / 9;
+      background: #111;
+      overflow: hidden;
+      box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
+      touch-action: none;
+    }
+
+    #game-shell:focus {
+      outline: none;
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* 左上角任務版（精簡） */
+    #quest-board {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      min-width: 140px;
+      max-width: min(240px, 22vw);
+      background: rgba(15, 20, 15, 0.78);
+      border: 1px solid rgba(180, 220, 140, 0.35);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #e8f5d8;
+      font-size: clamp(11px, 1.3vw, 14px);
+      line-height: 1.5;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #quest-board .quest-title {
+      font-size: clamp(11px, 1.2vw, 13px);
+      font-weight: 600;
+      color: #a8c878;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    #quest-board .quest-current {
+      list-style: none;
+      color: #f0ffb0;
+      font-weight: 500;
+    }
+
+    #quest-board .quest-current li {
+      margin: 2px 0;
+    }
+
+    #quest-board .quest-inv {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(180, 220, 140, 0.2);
+      font-size: clamp(10px, 1.1vw, 12px);
+      color: #ffe082;
+    }
+
+    /* 互動提示 */
+    #interact-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 48px;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid #fbbf24;
+      color: #fef3c7;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: clamp(12px, 1.5vw, 16px);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      z-index: 12;
+      white-space: nowrap;
+    }
+
+    #interact-hint.visible {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #interact-hint.visible:active {
+      transform: translateX(-50%) scale(0.97);
+      background: rgba(30, 40, 28, 0.95);
+    }
+
+    /* 觸控移動按鈕：全高透明熱區 + 中央小箭頭 */
+    .touch-btn {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: clamp(52px, 11vw, 88px);
+      border: none;
+      background: transparent;
+      padding: 0;
+      z-index: 11;
+      touch-action: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .touch-btn-left {
+      left: 0;
+    }
+
+    .touch-btn-right {
+      right: 0;
+    }
+
+    .touch-btn-arrow {
+      position: absolute;
+      top: 50%;
+      width: clamp(30px, 5.2vw, 42px);
+      height: clamp(30px, 5.2vw, 42px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(12, 18, 28, 0.58);
+      border: 1.5px solid rgba(251, 191, 36, 0.42);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+      transform: translateY(-50%);
+      transition: background 0.14s, border-color 0.14s, box-shadow 0.14s, transform 0.14s;
+      pointer-events: none;
+    }
+
+    .touch-btn-left .touch-btn-arrow {
+      left: clamp(10px, 2vw, 16px);
+    }
+
+    .touch-btn-right .touch-btn-arrow {
+      right: clamp(10px, 2vw, 16px);
+    }
+
+    .touch-btn-arrow::before {
+      content: '';
+      display: block;
+      width: 9px;
+      height: 9px;
+      border-left: 2.5px solid rgba(254, 243, 199, 0.9);
+      border-bottom: 2.5px solid rgba(254, 243, 199, 0.9);
+      transform: rotate(45deg);
+      margin-left: 2px;
+    }
+
+    .touch-btn-right .touch-btn-arrow::before {
+      transform: rotate(-135deg);
+      margin-left: 0;
+      margin-right: 2px;
+    }
+
+    .touch-btn.active .touch-btn-arrow,
+    .touch-btn:active .touch-btn-arrow {
+      background: rgba(255, 215, 64, 0.32);
+      border-color: rgba(255, 230, 120, 0.88);
+      box-shadow: 0 0 14px rgba(255, 215, 64, 0.28);
+      transform: translateY(-50%) scale(1.06);
+    }
+
+    .touch-btn.active .touch-btn-arrow::before,
+    .touch-btn:active .touch-btn-arrow::before {
+      border-color: #fff;
+    }
+
+    /* Toast */
+    #toast {
+      position: absolute;
+      left: 50%;
+      top: 22%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #86efac;
+      color: #f0fdf4;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: clamp(12px, 1.5vw, 16px);
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 對話／介面 */
+    #dialog-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      z-index: 30;
+    }
+
+    #dialog-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #dialog-panel {
+      background: rgba(30, 40, 28, 0.95);
+      border: 2px solid rgba(180, 220, 140, 0.5);
+      border-radius: 12px;
+      padding: 24px 28px;
+      max-width: min(520px, 80%);
+      color: #e8f5d8;
+      text-align: center;
+    }
+
+    #dialog-title {
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 700;
+      color: #f0ffb0;
+      margin-bottom: 12px;
+    }
+
+    #dialog-body {
+      font-size: clamp(13px, 1.6vw, 17px);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    #dialog-hint {
+      font-size: clamp(11px, 1.2vw, 13px);
+      color: #a8c878;
+    }
+
+    #hint-bar {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(200, 220, 180, 0.55);
+      font-size: clamp(10px, 1.1vw, 12px);
+      pointer-events: none;
+      z-index: 5;
+      white-space: nowrap;
+    }
+
+    /* 直向提示：僅在觸控裝置且為直向時顯示 */
+    #rotate-hint {
+      display: none;
+    }
+
+    @media (orientation: portrait) and (pointer: coarse) {
+      #rotate-hint {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        padding: 24px;
+        text-align: center;
+        background: radial-gradient(circle at 50% 40%, #16213a 0%, #0a0a0f 70%);
+        color: #f3e7c0;
+      }
+    }
+
+    .rotate-phone {
+      font-size: clamp(64px, 22vw, 110px);
+      line-height: 1;
+      transform-origin: 50% 50%;
+      animation: rotate-phone-anim 2s ease-in-out infinite;
+      filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5));
+    }
+
+    @keyframes rotate-phone-anim {
+      0%   { transform: rotate(0deg); }
+      40%  { transform: rotate(0deg); }
+      60%  { transform: rotate(-90deg); }
+      90%  { transform: rotate(-90deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .rotate-text {
+      font-size: clamp(18px, 6vw, 26px);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .rotate-sub {
+      font-size: clamp(13px, 4vw, 16px);
+      color: rgba(243, 231, 192, 0.65);
+    }
+  </style>
+</head>
+<body>
+  <div id="rotate-hint" aria-hidden="true">
+    <div class="rotate-phone">📱</div>
+    <div class="rotate-text">請將手機轉為橫向</div>
+    <div class="rotate-sub">↻ 橫向遊玩體驗最佳</div>
+  </div>
+  <div id="app">
+    <div id="game-shell">
+      <div id="quest-board" aria-label="任務版"></div>
+      <div id="interact-hint" aria-live="polite" role="button" tabindex="-1"></div>
+      <button type="button" id="touch-btn-left" class="touch-btn touch-btn-left" aria-label="向左移動">
+        <span class="touch-btn-arrow" aria-hidden="true"></span>
+      </button>
+      <button type="button" id="touch-btn-right" class="touch-btn touch-btn-right" aria-label="向右移動">
+        <span class="touch-btn-arrow" aria-hidden="true"></span>
+      </button>
+      <div id="toast" role="status" aria-live="polite"></div>
+      <canvas id="game-canvas" width="2560" height="1080" aria-label="遊戲畫布"></canvas>
+
+      <div id="dialog-overlay">
+        <div id="dialog-panel">
+          <div id="dialog-title"></div>
+          <div id="dialog-body"></div>
+          <div id="dialog-hint">Enter / Space / Esc 或點擊關閉</div>
+        </div>
+      </div>
+
+      <div id="hint-bar">A/D 或 ←→ 移動 · 左右按鈕 / Enter / Space / 點擊提示互動</div>
+    </div>
+  </div>
+
+  <script type="module" src="engine.js"></script>
+</body>
+</html>
