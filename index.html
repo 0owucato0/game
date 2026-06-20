@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>森林小徑 — 21:9 橫軸關卡</title>
-  
+    <audio id="game-bgm" src="bgm.mp3" loop></audio>
   <script>
   /*
   ====================================================================
@@ -77,45 +78,43 @@
       image-rendering: crisp-edges;
     }
 
-    /* ========================================== */
-    /* 學術防護浮水印：防止截圖與錄影盜用 */
-    /* ========================================== */
-    .academic-watermark {
+    .academic-marquee {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      z-index: 9999;
+      height: clamp(10px, 10px, 10px); /* 扁平優雅的高度 */
+      background-color: #000000; /* 黑底 */
+      color: #ffffff; /* 白字 */
+      z-index: 9999; /* 確保在最上層 */
+      overflow: hidden;
+      white-space: nowrap;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
-      background-color: rgba(255, 255, 255, 0.05); /* 極淡背景 */
-      color: rgba(200, 200, 200, 0.35); /* 半透明文字 */
       font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
-      text-align: center;
+      font-size: clamp(8px, 8pt, 13px);
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       pointer-events: none; /* 讓點擊穿透，不影響遊戲 */
       user-select: none;
-      transform: rotate(-15deg);
     }
 
-    .academic-watermark h1 {
-      font-size: 5vw;
-      margin: 0;
-      letter-spacing: 2px;
+    .marquee-content {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee-animation 100s linear infinite;
     }
 
-    .academic-watermark p {
-      font-size: 2vw;
-      margin: 8px 0;
-      font-weight: bold;
+    @keyframes marquee-animation {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* 左上角任務版（精簡） */
+    /* 左上角任務版（微調 top 避開跑馬燈） */
     #quest-board {
       position: absolute;
-      top: 14px;
+      top: 36px; /* ✨ 從 14px 調整至 36px，完美避開跑馬燈 */
       left: 14px;
       min-width: 140px;
       max-width: min(240px, 22vw);
@@ -348,7 +347,7 @@
       white-space: nowrap;
     }
 
-    /* 麵包店小遊戲：隱藏一般 HUD 與移動控制 */
+    /* 麵包店小遊戲 */
     #game-shell.bakery-mode #quest-board,
     #game-shell.bakery-mode #interact-hint,
     #game-shell.bakery-mode #hint-bar,
@@ -415,11 +414,10 @@
   <div id="app">
     <div id="game-shell">
       
-      <div class="academic-watermark" aria-hidden="true">
-        <h1>[ 作業展示 ]</h1>
-        <p>僅供課程繳交作業評分使用</p>
-        <p>嚴禁任何形式之二次更改</p>
-        <p>嚴禁老師用作教材或公開播放</p>
+      <div class="academic-marquee" aria-hidden="true">
+        <div class="marquee-content">
+          🛑 ⚠️【作業展示】本專案僅供課程作業評分與學術展示使用 ⚠️ 🚫 嚴禁任何形式之二次更改、重製或二次發布 🚫 嚴禁任何人（含教師）將此遊戲用作教材、教學範例或公開播放 🚫 著作權所有，侵權必究 🛑 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🛑 ⚠️【作業展示】本專案僅供課程作業評分與學術展示使用 ⚠️ 🚫 嚴禁任何形式之二次更改、重製或二次發布 🚫 嚴禁任何人（含教師）將此遊戲用作教材、教學範例或公開播放 🚫 著作權所有，侵權必究 🛑
+        </div>
       </div>
 
       <div id="quest-board" aria-label="任務版"></div>
@@ -453,7 +451,7 @@
     console.log(
       "%c此專案受版權保護。\n" +
       "聲明如下：\n" +
-      "1. 僅供學術繳交作業展示與評分使用。\n" +
+      "1. 僅供學術作業展示與評分使用。\n" +
       "2. %c🚫 嚴禁任何人（包含老師）將此專案作為教材或公開展示。 🚫\n%c" +
       "3. %c🚫 嚴禁對程式碼與素材進行反向工程、二次更改或重製。 🚫",
       "font-size: 14px; color: #333; line-height: 1.5;",
@@ -461,6 +459,32 @@
       "font-size: 14px; color: #333;",
       "color: #cf1322; font-weight: bold; font-size: 14px;"
     );
+  </script>
+
+
+
+
+  <script>
+    const bgm = document.getElementById('game-bgm');
+    
+    // ✨ 依然貼心保持最舒服的 50% 音量
+    bgm.volume = 0.2; 
+
+    // 啟動音樂的溫柔開關
+    const startMusic = () => {
+      // 試著播放，並溫柔接住任何瀏覽器的小脾氣
+      bgm.play().catch(err => console.log("小精靈正在等待玩家的第一次互動喲～"));
+      
+      // 成功播放後，把所有監聽器功成身退地移除
+      window.removeEventListener('click', startMusic);
+      window.removeEventListener('touchstart', startMusic);
+      window.removeEventListener('keydown', startMusic);
+    };
+
+    // 只要玩家有任何操作（點擊、觸控、按鍵盤），音樂就立刻無縫響起！
+    window.addEventListener('click', startMusic);
+    window.addEventListener('touchstart', startMusic);
+    window.addEventListener('keydown', startMusic);
   </script>
 
   <script>
@@ -471,39 +495,5 @@
     })();
   </script>
   <script type="module" src="engine.js?v=align2"></script>
-  <div id="youtube-music-player" style="display: none;"></div>
-
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script>
-    var ytPlayer;
-    // 當 YouTube 準備好時，會自動呼叫這個魔法咒語
-    function onYouTubeIframeAPIReady() {
-      ytPlayer = new YT.Player('youtube-music-player', {
-        height: '0',
-        width: '0',
-        videoId: 'AFWB2I6ZYNY', // 你選的超可愛放鬆音樂！
-        playerVars: {
-          'autoplay': 0,
-          'loop': 1, // 讓音樂無限循環
-          'playlist': 'AFWB2I6ZYNY' 
-        },
-        events: {
-          'onReady': function(event) {
-            // 音樂準備好囉！我們等玩家輕輕碰一下畫面就開始播
-            const startMusic = () => {
-              event.target.playVideo();
-              // 開始播放後，這個任務就完成了，可以退下了
-              window.removeEventListener('click', startMusic);
-              window.removeEventListener('touchstart', startMusic);
-            };
-            
-            // 只要玩家一點擊滑鼠或觸控螢幕，音樂就會響起
-            window.addEventListener('click', startMusic);
-            window.addEventListener('touchstart', startMusic);
-          }
-        }
-      });
-    }
-  </script>
 </body>
 </html>

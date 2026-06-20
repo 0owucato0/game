@@ -923,8 +923,35 @@ function showBakeryTutorial() {
       + '③ 烤好的麵包用紙袋裝袋，再拖到右下角出餐區交貨。\n'
       + '時間內完成越多越好，加油！',
   );
-  pendingAfterDialog = resumeBakery;
+
   updateDialogDom();
+
+  //強制監聽關閉對話框
+  const bypassDialog = () => {
+    // 1. 找到對話框黑底遮罩
+    const overlay = document.getElementById('dialog-overlay');
+    if (overlay && overlay.classList.contains('visible')) {
+      overlay.classList.remove('visible'); // 強制隱藏對話框
+      
+      //移除臨時監聽器，避免以後重複觸發
+      window.removeEventListener('click', bypassDialog);
+      window.removeEventListener('keydown', bypassDialog);
+      
+      // 3.強行啟動遊戲
+      if (typeof resumeBakery === 'function') {
+        resumeBakery();
+      }
+    }
+  };
+
+  // 延遲時間（200毫秒），防止誤觸
+  setTimeout(() => {
+    window.addEventListener('click', bypassDialog);
+    window.addEventListener('keydown', bypassDialog);
+  }, 200);
+
+  const shell = document.getElementById('game-shell');
+  if (shell) shell.focus();
 }
 
 function onTownReady(lv) {
