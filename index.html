@@ -80,13 +80,14 @@
 
     .academic-marquee {
       position: absolute;
-      top: 0;
+      top: 15px;
       left: 0;
       width: 100%;
-      height: clamp(10px, 10px, 10px);
+      height: clamp(0px, 20px, 40px);
       background-color: #000000; /* 黑底 */
       color: #ffffff; /* 白字 */
-      z-index: 9998; /* 確保在最上層 */
+	  opacity: 0.85;
+      z-index: 9999; /* 確保在最上層 */
       overflow: hidden;
       white-space: nowrap;
       display: flex;
