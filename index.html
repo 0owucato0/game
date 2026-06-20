@@ -83,10 +83,10 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: clamp(10px, 10px, 10px); /* 扁平優雅的高度 */
+      height: clamp(10px, 10px, 10px);
       background-color: #000000; /* 黑底 */
       color: #ffffff; /* 白字 */
-      z-index: 9999; /* 確保在最上層 */
+      z-index: 9998; /* 確保在最上層 */
       overflow: hidden;
       white-space: nowrap;
       display: flex;
@@ -96,7 +96,7 @@
       font-weight: bold;
       letter-spacing: 0.05em;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-      pointer-events: none; /* 讓點擊穿透，不影響遊戲 */
+      pointer-events: none; /* 讓點擊穿透 */
       user-select: none;
     }
 
@@ -357,7 +357,7 @@
 
     /* 直向提示 */
     #rotate-hint {
-	z-index: 6;
+	z-index: 9999;
       display: none;
     }
 
