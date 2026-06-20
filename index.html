@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>森林小徑 — 21:9 橫軸關卡</title>
+  <title>解謎小遊戲</title>
     <audio id="game-bgm" src="bgm.mp3" loop></audio>
   <script>
   /*
@@ -445,7 +445,7 @@
       margin-bottom: 12px;
       image-rendering: pixelated; /* 保持像素圖的清晰顆粒感 */
       
-      /* ✨ 核心魔法：捨棄 multiply，改用我們剛剛做好的精準去白底濾鏡！ */
+      /* 白底濾鏡 */
       filter: url(#remove-white-perfectly); 
     }
   </style>
@@ -532,7 +532,7 @@
     // 啟動音樂
     const startMusic = () => {
       // 試著播放
-      bgm.play().catch(err => console.log("小精靈正在等待玩家的第一次互動喲～"));
+      bgm.play().catch(err => console.log("等待玩家互動"));
       
       // 成功播放監聽器移除
       window.removeEventListener('click', startMusic);

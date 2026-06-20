@@ -915,6 +915,11 @@ function exitBakeryToTown(score) {
   goToLevel(4, { atBakeryDoor: true });
 }
 
+function showWelcomeDialog() {
+  showDialog('歡迎', '歡迎遊玩解謎小遊戲！\n透過[A] [D]或[←] [→]控制角色移動\n\n請點擊並繼續');
+  updateDialogDom();
+}
+
 function showBakeryTutorial() {
   showDialog(
     '麵包店老闆',
@@ -1646,9 +1651,12 @@ async function boot() {
   await loadLevelAssets(lv);
   updateQuestBoard();
   onLevelReady(lv);
-  state.gameState = GameState.PLAYING;
+  if (bootLevel === 0) showWelcomeDialog();
+  if (!state.ui.visible) state.gameState = GameState.PLAYING;
   requestAnimationFrame(loop);
-
+  if (typeof window.hideLoadingScreen === 'function') {
+    window.hideLoadingScreen();
+  }
 }
 
 boot();
