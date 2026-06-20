@@ -411,7 +411,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 1; /* ✨ 墊在最下面 */
+      z-index: 1; /* 墊在最下面 */
     }
 
     .loading-text {
@@ -427,17 +427,24 @@
       50% { opacity: 1; transform: scale(1); }
     }
 
-    /* ========================================== */
-    /* 2. 遊戲畫布：加上 position 和 z-index: 2（站到前面來） */
-    /* ========================================== */
     #game-canvas {
-      position: relative; /* ✨ 加上這行，才能讓 z-index 生效 */
-      z-index: 2;        /* ✨ 站在載入畫面的正前方 */
+      position: relative; /* 加上這行，才能讓 z-index 生效 */
+      z-index: 2;        /* 站在載入畫面的正前方 */
       display: block;
       width: 100%;
       height: 100%;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+    }
+	
+	.loading-gif {
+      width: clamp(60px, 10vw, 90px);
+      height: auto;
+      margin-bottom: 12px;
+      image-rendering: pixelated; /* 保持像素圖的清晰顆粒感 */
+      
+      /* ✨ 核心魔法：捨棄 multiply，改用我們剛剛做好的精準去白底濾鏡！ */
+      filter: url(#remove-white-perfectly); 
     }
   </style>
 </head>
@@ -450,6 +457,17 @@
   <div id="app">
     <div id="game-shell">
       <div id="loading-screen">
+	  <svg style="position: absolute; width: 0; height: 0;">
+          <filter id="remove-white-perfectly">
+            <feColorMatrix type="matrix" values="
+              1 0 0 0 0
+              0 1 0 0 0
+              0 0 1 0 0
+              -3 -3 -3 10 -1
+            "/>
+          </filter>
+        </svg>
+	  <img class="loading-gif" src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXd6dTZzdHg3b3czcmUxM3p2bjYzOGd5OHNmd3JzeHl5bnlrMHppYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/yASFCj2K0MGeASqSom/giphy.gif" alt="Loading...">
         <div class="loading-text">素材載入中，請稍後...</div>
       </div>
       <div class="academic-marquee" aria-hidden="true">
