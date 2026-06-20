@@ -138,6 +138,9 @@ function loadImage(path, processWhiteKey = false) {
   if (!path) return Promise.resolve(null);
   const cacheKey = processWhiteKey ? `${path}#key` : path;
   if (imageCache.has(cacheKey)) return imageCache.get(cacheKey);
+  if (typeof window.hideLoadingScreen === 'function') {
+    window.hideLoadingScreen();
+}
 
   const p = new Promise((resolve) => {
     const img = new Image();

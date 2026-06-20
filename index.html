@@ -403,6 +403,32 @@
       font-size: clamp(13px, 4vw, 16px);
       color: rgba(243, 231, 192, 0.65);
     }
+	#loading-screen {
+      position: absolute;
+      inset: 0;
+      background-color: #2c2c35; /* 溫柔的高級灰底 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10005; /* 確保在最上層，蓋住所有東西 */
+      transition: opacity 0.4s ease; /* 消失時會有美美的淡出效果 */
+      pointer-events: auto; /* 載入時不讓玩家亂點 */
+    }
+
+    .loading-text {
+      color: #f3e7c0; /* 溫馨的米白字 */
+      font-size: clamp(14px, 2.2vw, 18px);
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      /* 讓文字溫柔呼吸的小動畫 */
+      animation: loading-pulse 1.6s infinite ease-in-out;
+    }
+
+    @keyframes loading-pulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -413,7 +439,9 @@
   </div>
   <div id="app">
     <div id="game-shell">
-      
+      <div id="loading-screen">
+        <div class="loading-text">素材載入中，請稍後...</div>
+      </div>
       <div class="academic-marquee" aria-hidden="true">
         <div class="marquee-content">
           🛑 ⚠️【作業展示】本專案僅供課程作業評分與學術展示使用 ⚠️ 🚫 嚴禁任何形式之二次更改、重製或二次發布 🚫 嚴禁任何人（含教師）將此遊戲用作教材、教學範例或公開播放 🚫 著作權所有，侵權必究 🛑 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🛑 ⚠️【作業展示】本專案僅供課程作業評分與學術展示使用 ⚠️ 🚫 嚴禁任何形式之二次更改、重製或二次發布 🚫 嚴禁任何人（含教師）將此遊戲用作教材、教學範例或公開播放 🚫 著作權所有，侵權必究 🛑
@@ -465,23 +493,35 @@
 
 
   <script>
+  
+  //移除載入畫面
+    window.hideLoadingScreen = function() {
+      const loader = document.getElementById('loading-screen');
+      if (loader) {
+        loader.style.opacity = '0'; // 啟動淡出動畫
+        // 等動畫播完（0.4秒），再元素移除
+        setTimeout(() => {
+          loader.remove();
+        }, 400);
+      }
+    };
     const bgm = document.getElementById('game-bgm');
     
-    // ✨ 依然貼心保持最舒服的 50% 音量
+    //50% 音量
     bgm.volume = 0.2; 
 
-    // 啟動音樂的溫柔開關
+    // 啟動音樂
     const startMusic = () => {
-      // 試著播放，並溫柔接住任何瀏覽器的小脾氣
+      // 試著播放
       bgm.play().catch(err => console.log("小精靈正在等待玩家的第一次互動喲～"));
       
-      // 成功播放後，把所有監聽器功成身退地移除
+      // 成功播放監聽器移除
       window.removeEventListener('click', startMusic);
       window.removeEventListener('touchstart', startMusic);
       window.removeEventListener('keydown', startMusic);
     };
 
-    // 只要玩家有任何操作（點擊、觸控、按鍵盤），音樂就立刻無縫響起！
+    // 只要玩家操作
     window.addEventListener('click', startMusic);
     window.addEventListener('touchstart', startMusic);
     window.addEventListener('keydown', startMusic);
