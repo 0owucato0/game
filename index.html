@@ -471,5 +471,39 @@
     })();
   </script>
   <script type="module" src="engine.js?v=align2"></script>
+  <div id="youtube-music-player" style="display: none;"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    var ytPlayer;
+    // 當 YouTube 準備好時，會自動呼叫這個魔法咒語
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('youtube-music-player', {
+        height: '0',
+        width: '0',
+        videoId: 'AFWB2I6ZYNY', // 你選的超可愛放鬆音樂！
+        playerVars: {
+          'autoplay': 0,
+          'loop': 1, // 讓音樂無限循環
+          'playlist': 'AFWB2I6ZYNY' 
+        },
+        events: {
+          'onReady': function(event) {
+            // 音樂準備好囉！我們等玩家輕輕碰一下畫面就開始播
+            const startMusic = () => {
+              event.target.playVideo();
+              // 開始播放後，這個任務就完成了，可以退下了
+              window.removeEventListener('click', startMusic);
+              window.removeEventListener('touchstart', startMusic);
+            };
+            
+            // 只要玩家一點擊滑鼠或觸控螢幕，音樂就會響起
+            window.addEventListener('click', startMusic);
+            window.addEventListener('touchstart', startMusic);
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
