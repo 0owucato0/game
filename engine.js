@@ -138,9 +138,6 @@ function loadImage(path, processWhiteKey = false) {
   if (!path) return Promise.resolve(null);
   const cacheKey = processWhiteKey ? `${path}#key` : path;
   if (imageCache.has(cacheKey)) return imageCache.get(cacheKey);
-  if (typeof window.hideLoadingScreen === 'function') {
-    window.hideLoadingScreen();
-}
 
   const p = new Promise((resolve) => {
     const img = new Image();
@@ -491,7 +488,8 @@ function updatePlayer(level, dt) {
   updateBear(level, dt);
 
   let vx = 0;
-  const speed = input.touchHeld ? TOUCH_MOVE_SPEED : MOVE_SPEED;
+  const baseSpeed = input.touchHeld ? TOUCH_MOVE_SPEED : MOVE_SPEED;
+  const speed = baseSpeed * (level.moveSpeedScale ?? 1);
   if (input.left && input.right) vx = 0;
   else if (input.left) vx = -speed * dt;
   else if (input.right) vx = speed * dt;
@@ -1650,6 +1648,7 @@ async function boot() {
   onLevelReady(lv);
   state.gameState = GameState.PLAYING;
   requestAnimationFrame(loop);
+
 }
 
 boot();
