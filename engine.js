@@ -25,7 +25,10 @@ import {
   isBakeryAlignMode,
   handleBakeryAlignWheel,
   resumeBakery,
+  initBakeryUi,
 } from './bakery.js';
+import { initFullscreen, setDialogFullscreenVisible } from './fullscreen.js';
+import { getOrCreateUuid } from './leaderboard.js';
 import {
   CANVAS_W,
   CANVAS_H,
@@ -919,7 +922,14 @@ function exitBakeryToTown(score) {
 }
 
 function showWelcomeDialog() {
-  showDialog('歡迎', '歡迎遊玩解謎小遊戲！\n透過[A] [D]或[←] [→]控制角色移動\n\n請點擊並繼續');
+  setDialogFullscreenVisible(true);
+  showDialog(
+    '歡迎',
+    '歡迎遊玩解謎小遊戲！\n'
+      + '透過 [A] [D] 或 [←] [→] 控制角色移動\n\n'
+      + '📱 手機玩家建議點下方「全螢幕遊玩」，或使用右上角全螢幕按鈕，操作更順手。\n\n'
+      + '請點擊並繼續',
+  );
   updateDialogDom();
 }
 
@@ -1051,6 +1061,7 @@ function updateDialogDom() {
   dialogTitleEl.textContent = state.ui.title;
   dialogBodyEl.textContent = state.ui.body;
   dialogOverlay.classList.toggle('visible', state.ui.visible);
+  if (!state.ui.visible) setDialogFullscreenVisible(false);
 }
 
 function updateQuestBoard() {
@@ -1542,6 +1553,9 @@ function initCanvas() {
 
 async function boot() {
   initCanvas();
+  initFullscreen();
+  initBakeryUi();
+  getOrCreateUuid();
   input.bind();
 
   const shell = document.getElementById('game-shell');

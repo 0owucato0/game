@@ -336,6 +336,120 @@
       color: #a8c878;
     }
 
+    #dialog-actions {
+      margin-bottom: 12px;
+    }
+
+    #dialog-actions[hidden] {
+      display: none !important;
+    }
+
+    .dialog-action-btn,
+    #fs-toggle-btn {
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid rgba(180, 220, 140, 0.55);
+      background: rgba(60, 90, 45, 0.92);
+      color: #f0ffb0;
+      border-radius: 8px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .dialog-action-btn {
+      padding: 10px 22px;
+      font-size: clamp(13px, 1.5vw, 16px);
+      font-weight: 700;
+    }
+
+    .dialog-action-btn:active,
+    #fs-toggle-btn:active {
+      transform: scale(0.97);
+    }
+
+    #fs-toggle-btn {
+      position: absolute;
+      top: 48px;
+      right: 12px;
+      z-index: 9997;
+      padding: 8px 14px;
+      font-size: clamp(11px, 1.3vw, 14px);
+      font-weight: 700;
+      pointer-events: auto;
+    }
+
+    #name-edit-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 40;
+    }
+
+    #name-edit-overlay.visible {
+      display: flex;
+    }
+
+    #name-edit-panel {
+      background: rgba(30, 40, 28, 0.97);
+      border: 2px solid rgba(180, 220, 140, 0.5);
+      border-radius: 12px;
+      padding: 22px 24px;
+      min-width: min(360px, 86vw);
+      color: #e8f5d8;
+      text-align: center;
+    }
+
+    #name-edit-panel h3 {
+      font-size: clamp(16px, 2vw, 20px);
+      color: #f0ffb0;
+      margin-bottom: 12px;
+    }
+
+    #name-edit-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(180, 220, 140, 0.45);
+      background: rgba(10, 14, 10, 0.85);
+      color: #f0ffb0;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    #name-edit-hint {
+      font-size: 13px;
+      color: #a8c878;
+      margin-bottom: 14px;
+    }
+
+    #name-edit-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    #name-edit-actions button {
+      font-family: inherit;
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(180, 220, 140, 0.45);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #name-edit-confirm {
+      background: #c8853a;
+      color: #fff;
+    }
+
+    #name-edit-cancel {
+      background: rgba(60, 50, 40, 0.9);
+      color: #f3e7c0;
+    }
+
     #hint-bar {
       position: absolute;
       bottom: 10px;
@@ -487,12 +601,28 @@
         <span class="touch-btn-arrow" aria-hidden="true"></span>
       </button>
       <div id="toast" role="status" aria-live="polite"></div>
+      <button type="button" id="fs-toggle-btn" aria-label="全螢幕" title="全螢幕">⛶ 全螢幕</button>
       <canvas id="game-canvas" width="2560" height="1080" aria-label="遊戲畫布"></canvas>
+
+      <div id="name-edit-overlay" aria-hidden="true">
+        <div id="name-edit-panel">
+          <h3>修改顯示名稱</h3>
+          <input id="name-edit-input" type="text" maxlength="20" autocomplete="nickname" />
+          <p id="name-edit-hint">最多 20 字</p>
+          <div id="name-edit-actions">
+            <button type="button" id="name-edit-confirm">確定</button>
+            <button type="button" id="name-edit-cancel">取消</button>
+          </div>
+        </div>
+      </div>
 
       <div id="dialog-overlay">
         <div id="dialog-panel">
           <div id="dialog-title"></div>
           <div id="dialog-body"></div>
+          <div id="dialog-actions" hidden>
+            <button type="button" id="dialog-fs-btn" class="dialog-action-btn">全螢幕遊玩</button>
+          </div>
           <div id="dialog-hint">Enter / Space / Esc 或點擊關閉</div>
         </div>
       </div>
