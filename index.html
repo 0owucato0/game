@@ -592,6 +592,19 @@
       /* 白底濾鏡 */
       filter: url(#remove-white-perfectly); 
     }
+
+	  /* 讓全站文字無法被滑鼠選取反白 */
+body {
+  -webkit-user-select: none;  /* Safari */
+  -ms-user-select: none;      /* IE10+ */
+  user-select: none;          /* 標準 */
+}
+
+/* 防止圖片被滑鼠拖曳到桌面儲存 */
+img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
   </style>
 </head>
 <body>
@@ -677,6 +690,27 @@
       "font-size: 14px; color: #333;",
       "color: #cf1322; font-weight: bold; font-size: 14px;"
     );
+
+	  // 1. 禁用滑鼠右鍵
+  document.addEventListener('contextmenu', event => event.preventDefault());
+
+  // 2. 禁用複製、剪下、全選
+  document.addEventListener('copy', event => event.preventDefault());
+  document.addEventListener('cut', event => event.preventDefault());
+  document.addEventListener('selectstart', event => event.preventDefault());
+
+  // 3. 禁用開發者工具快捷鍵 (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U)
+  document.addEventListener('keydown', function (e) {
+    if (
+      e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+      (e.ctrlKey && e.key === 'u')
+    ) {
+      e.preventDefault();
+      alert('本網站已啟用版權保護，禁止查看原始碼。');
+      return false;
+    }
+  });
   </script>
 
 
