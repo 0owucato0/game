@@ -40,33 +40,36 @@
       background: transparent;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #0a0a0f;
-      font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
-    }
+/* 從第一秒開始就全面戒備，不給網頁任何滾動的藉口 */
+html, body {
+  width: 100%;
+  height: 100dvh; /* 隨時跟隨 Safari 剩餘空間即時縮放 */
+  overflow: hidden !important;
+  position: fixed; /* 強制釘死，不讓 iOS 有任何橡皮筋回彈的機會 */
+  touch-action: none !important; /* 告訴瀏覽器：別碰我的觸控！ */
+}
 
-    #app {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-    }
+#app {
+  width: 100%;
+  height: 100dvh; /* 確保容器也是完美高度 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
 
-    #game-shell {
-      position: relative;
-      width: min(100vw, calc(100vh * 21 / 9));
-      height: min(100vh, calc(100vw * 9 / 21));
-      aspect-ratio: 21 / 9;
-      background: #111;
-      overflow: hidden;
-      box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
-      touch-action: none;
-    }
+#game-shell {
+  position: relative;
+  /* 這裡高度改成 100dvh 進行動態計算 */
+  width: min(100vw, calc(100dvh * 21 / 9));
+  height: min(100dvh, calc(100vw * 9 / 21));
+  aspect-ratio: 21 / 9;
+  background: #111;
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
+  touch-action: none !important; /* 100% 鎖死，把事件全讓給裡面的 Canvas */
+}
+
 
     #game-shell:focus {
       outline: none;
